@@ -9,6 +9,8 @@ class CommandExecuteService {
     async executeSync(commandId) {
         const scriptPath = `${this.scriptsDir}/${commandId}.sh`;
 
+        this.logger.info(`Starting execution of "${commandId} command."`);
+
         return new Promise((resolve) => {
             exec(`bash ${scriptPath}`, (error, stdout, stderr) => {
                 if (error) {

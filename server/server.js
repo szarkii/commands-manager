@@ -43,9 +43,9 @@ http.createServer(async function (request, response) {
         return;
     }
 
-    if (request.url.startsWith("/api/execute") && request.method === 'GET') {
+    if (request.url.startsWith("/api/execute") && ["GET", "POST"].includes(request.method)) {
         const commandId = request.url.split("/")[3];
-        // TODO Validation
+        // TODO Validation, mapping from ID to file
 
         const output = await commandExecuteService.executeSync(commandId);
         response.writeHead(200);
