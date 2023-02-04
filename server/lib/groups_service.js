@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const GROUPS_CONF_FILE = __dirname + "/../conf/groups.conf"
+const GROUPS_CONF_FILE = __dirname + "/../conf/groups.conf";
 
 function buildTreeFromArray(groups, parent, tree) {
     tree = typeof tree !== 'undefined' ? tree : [];

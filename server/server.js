@@ -2,43 +2,53 @@ const http = require("http");
 const fs = require("fs");
 
 const Logger = require("./lib/logger.js");
-const AuthenticationService = require("./lib/authentication_service.js");
+const UserAuthenticationService = require("./lib/user_authentication_service.js");
+const ApiAuthenticationService = require("./lib/api_authentication_service.js");
 const GroupsService = require("./lib/groups_service.js");
 const CommandExecuteService = require("./lib/command_execute_service.js");
-
-const SERVER_DEFAULT_PORT = 8080;
+const ConfigurationService = require("./lib/configuration_service");
 
 const INDEX_PATH = __dirname + "/html/index.html";
 const SCRIPTS_DIR_PATH = __dirname + "/scripts";
-// TODO: Add override configuration
 
-const SERVER_PORT = process.argv[2] || SERVER_DEFAULT_PORT;
+const SIGNATURE_HEADER = "x-hub-signature";
+
+const Configuration = new ConfigurationService(process.argv[2]).getConfiguration();
 
 const logger = new Logger();
-const authenticationService = new AuthenticationService();
+const userAuthenticationService = new UserAuthenticationService();
+const apiAuthenticationService = new ApiAuthenticationService(Configuration.api.token);
 const groupsService = new GroupsService();
 const commandExecuteService = new CommandExecuteService(SCRIPTS_DIR_PATH, logger);
 
-http.createServer(async function (request, response) {
-    if (request.url === "/") {
-        response.writeHead(200, { "Content-Type": "text/html" });
-        response.write(fs.readFileSync(INDEX_PATH));
-        response.end();
-        return;
-    }
+async function getRequestContent(request) {
+    return new Promise((resolve) => {
+        let requestData = "";
 
-    if (!authenticationService.isAuthenticated(request)) {
+        request.on("data", chunk => {
+            console.log(chunk);
+            requestData += chunk.toString();
+        });
+
+        request.on("end", () => {
+            resolve(requestData);
+        });
+    });
+}
+
+const apiServer = async (request, response) => {
+    const requestContent = await getRequestContent(request);
+    const token = request.headers[SIGNATURE_HEADER];
+
+    if (!apiAuthenticationService.isAuthenticated(requestContent, token)) {
         response.writeHead(401);
         response.end();
         return;
     }
 
-    if (request.url.startsWith("/groups")) {
-        if (request.method === 'GET') {
-            response.writeHead(200, { "Content-Type": "text/json" });
-            response.write(JSON.stringify(groupsService.getAllGroups()));
-        }
-
+    if (request.url === "/") {
+        response.writeHead(200);
+        response.write("Commands Manager API works.");
         response.end();
         return;
     }
@@ -50,6 +60,34 @@ http.createServer(async function (request, response) {
         const output = await commandExecuteService.executeSync(commandId);
         response.writeHead(200);
         response.write(output);
+        response.end();
+        return;
+    }
+
+    response.writeHead(404);
+    response.end();
+};
+
+const guiServer = async (request, response) => {
+    if (request.url === "/") {
+        response.writeHead(200, { "Content-Type": "text/html" });
+        response.write(fs.readFileSync(INDEX_PATH));
+        response.end();
+        return;
+    }
+
+    if (!userAuthenticationService.isAuthenticated(request)) {
+        response.writeHead(401);
+        response.end();
+        return;
+    }
+
+    if (request.url.startsWith("/groups")) {
+        if (request.method === 'GET') {
+            response.writeHead(200, { "Content-Type": "text/json" });
+            response.write(JSON.stringify(groupsService.getAllGroups()));
+        }
+
         response.end();
         return;
     }
@@ -99,6 +137,34 @@ http.createServer(async function (request, response) {
 
     response.writeHead(404);
     response.end();
-}).listen(SERVER_PORT, () => {
-    logger.info("Server running at 0.0.0.0:" + SERVER_PORT);
-});
+};
+
+const server = async (request, response) => {
+    if (request.port === Configuration.api.port) {
+        apiServer(request, response);
+    } else {
+        guiServer(request, response);
+    }
+};
+
+if (Configuration.api.enabled && Configuration.gui.enabled && Configuration.api.port === Configuration.gui.port) {
+    apiAuthenticationService.validateToken();
+
+    http.createServer(server).listen(Configuration.api.port, () => {
+        logger.info("API and GUI server running at 0.0.0.0:" + Configuration.api.port);
+    });
+} else {
+    if (Configuration.api.enabled) {
+        apiAuthenticationService.validateToken();
+
+        http.createServer(apiServer).listen(Configuration.api.port, () => {
+            logger.info("API server running at 0.0.0.0:" + Configuration.api.port);
+        });
+    }
+
+    if (Configuration.gui.enabled) {
+        http.createServer(guiServer).listen(Configuration.gui.port, () => {
+            logger.info("GUI server running at 0.0.0.0:" + Configuration.gui.port);
+        });
+    }
+}
