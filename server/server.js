@@ -7,6 +7,7 @@ const ApiAuthenticationService = require("./lib/api_authentication_service.js");
 const GroupsService = require("./lib/groups_service.js");
 const CommandExecuteService = require("./lib/command_execute_service.js");
 const ConfigurationService = require("./lib/configuration_service");
+const CommandsService = require("./lib/commands_service");
 
 const INDEX_PATH = __dirname + "/html/index.html";
 const SCRIPTS_DIR_PATH = __dirname + "/scripts";
@@ -15,10 +16,14 @@ const SIGNATURE_HEADER = "x-hub-signature";
 
 const Configuration = new ConfigurationService(process.argv[2]).getConfiguration();
 
+// With no dependencies
 const logger = new Logger();
 const userAuthenticationService = new UserAuthenticationService();
 const apiAuthenticationService = new ApiAuthenticationService(Configuration.api.token);
-const groupsService = new GroupsService();
+const commandsService = new CommandsService();
+
+// With dependecies
+const groupsService = new GroupsService(commandsService);
 const commandExecuteService = new CommandExecuteService(SCRIPTS_DIR_PATH, logger);
 
 async function getRequestContent(request) {

@@ -27,7 +27,7 @@ export class GroupsView extends AbstractView implements OnInit {
         });
     }
 
-    private renderGroup(parent: HTMLElement, group: Group, level: number = 1) {
+    private renderGroup(parent: HTMLElement, group: Group, level: number = 0) {
         const itemsGroup = HtmlElementsUtils.createDiv();
         const listItem = HtmlElementsUtils.createListItem(group.name);
         
@@ -35,6 +35,12 @@ export class GroupsView extends AbstractView implements OnInit {
         listItem.className += " ps-" + (level + 2);
         parent.appendChild(itemsGroup);
         
-        (group.subgroups || []).forEach(subgroup => this.renderGroup(itemsGroup, subgroup, level + 1));
+        (group.subgroups || []).forEach(subgroup => this.renderGroup(itemsGroup, subgroup, level + 2));
+
+        (group.commands || []).forEach(command => {
+            const commandItem = HtmlElementsUtils.createListItem(command.name);
+            commandItem.className += " ps-" + (level + 4);
+            parent.appendChild(commandItem);
+        });
     }
 }
