@@ -3,7 +3,9 @@ import { QueryElementService } from "../services/query-element.service";
 import { GroupsService } from "./groups.service";
 import { OnInit } from "../view/on-init";
 import { Group } from "./group/group";
-import { HtmlElementsUtils } from "../services/html/html-elements-utils";
+import { HtmlBootstrapListElement } from "../services/html/bootstrap/html-bootstrap-list-element";
+import { HtmlBootstrapLinkListElement } from "../services/html/bootstrap/html-bootstrap-link-list-element";
+import { HtmlDivElement } from "../services/html/html-div-element";
 
 enum HtmlId {
     List = "groups-list"
@@ -28,19 +30,19 @@ export class GroupsView extends AbstractView implements OnInit {
     }
 
     private renderGroup(parent: HTMLElement, group: Group, level: number = 0) {
-        const itemsGroup = HtmlElementsUtils.createDiv();
-        const listItem = HtmlElementsUtils.createListItem(group.name);
-        
-        itemsGroup.appendChild(listItem);
-        listItem.className += " ps-" + (level + 2);
+        const itemsGroup = new HtmlDivElement().htmlElement;
+        const listItem = new HtmlBootstrapListElement({ content: group.name });
+
+        itemsGroup.appendChild(listItem.htmlElement);
+        listItem.setLeftPadding(level + 2);
         parent.appendChild(itemsGroup);
-        
+
         (group.subgroups || []).forEach(subgroup => this.renderGroup(itemsGroup, subgroup, level + 2));
 
         (group.commands || []).forEach(command => {
-            const commandItem = HtmlElementsUtils.createListItem(command.name);
-            commandItem.className += " ps-" + (level + 4);
-            parent.appendChild(commandItem);
+            const commandItem = new HtmlBootstrapLinkListElement({ content: command.name });
+            commandItem.setLeftPadding(level + 4);
+            parent.appendChild(commandItem.htmlElement);
         });
     }
 }

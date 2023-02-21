@@ -2,6 +2,10 @@ body {
     background-color: #eef4fb;
 }
 
+.pointer {
+    cursor: pointer
+}
+
 .version-box {
     position: fixed;
     right: 0;
