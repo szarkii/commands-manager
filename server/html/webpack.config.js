@@ -4,6 +4,7 @@ let fs = require('fs');
 const sourceFilesDir = __dirname + '/src';
 
 const groupsView = fs.readFileSync(sourceFilesDir + '/groups/groups.view.html');
+const commandView = fs.readFileSync(sourceFilesDir + '/commands/views/command.view.html');
 
 module.exports = {
     mode: "development",
@@ -36,7 +37,8 @@ module.exports = {
             inject: true,
             chunks: [],
             filename: 'index.html',
-            groupsView
+            groupsView,
+            commandView
         })
     ]
 };
