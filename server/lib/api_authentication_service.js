@@ -12,6 +12,10 @@ class ApiAuthenticationService {
     }
 
     isAuthenticated(requestContent, signature) {
+        if (!signature) {
+            return false;
+        }
+
         const actualSignature = crypto.createHmac("sha1", this.token).update(requestContent.toString()).digest("hex");
         return signature.replace(/^sha1=/, "") === actualSignature;
     }
