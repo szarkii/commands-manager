@@ -1,0 +1,28 @@
+<div *ngIf="(group$ | async) as group">
+    <p-panel [header]="group.id">
+        <div class="card">
+            <div class="flex card-container">
+                <div class="flex-2  mr-4">
+                    <a [routerLink]="['/groups', group.id, 'commands', 'new']">
+                        <p-button label="Add new command" icon="pi pi-code"></p-button>
+                    </a>
+                </div>
+
+                <div class="flex-1">
+                    <div class="p-inputgroup">
+                        <span class="p-inputgroup-addon">
+                            <i class="pi pi-box"></i>
+                        </span>
+
+                        <input pInputText placeholder="Add new group" />
+
+                        <button type="button" pButton icon="pi pi-check"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Edit group</h3>
+        ...
+    </p-panel>
+</div>

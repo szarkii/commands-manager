@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { TreeNode } from 'primeng/api';
 import { map } from 'rxjs';
 import { CommandBasicInfo } from 'src/app/command/command-basic-info';
@@ -15,7 +16,7 @@ export class GroupsListComponent implements OnInit {
 
   private groupsTreeNode: TreeNode[] = [];
 
-  constructor(private groupsService: GroupsService) {
+  constructor(private router: Router, private groupsService: GroupsService) {
   }
 
   ngOnInit(): void {
@@ -34,7 +35,8 @@ export class GroupsListComponent implements OnInit {
         label: group.name,
         icon: "pi pi-box",
         data: {
-          isCommand: false
+          isCommand: false,
+          id: group.id
         }
       };
 
@@ -47,7 +49,8 @@ export class GroupsListComponent implements OnInit {
           label: command.name,
           icon: "pi pi-code",
           data: {
-            isCommand: true
+            isCommand: true,
+            id: command.id
           }
         }));
       }
@@ -62,7 +65,8 @@ export class GroupsListComponent implements OnInit {
     return this.groupsTreeNode;
   }
 
-  public redirectToCommand() {
-    console.log(this.selectedNode);
+  public redirect() {
+    const route = this.selectedNode.data.isCommand ? "commands" : "groups";
+    this.router.navigate(["/", route, this.selectedNode.data.id]);
   }
 }
