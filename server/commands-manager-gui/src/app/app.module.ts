@@ -1,9 +1,9 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
 import { TreeModule } from 'primeng/tree';
 import { AppRoutingModule } from './app-routing.module';
@@ -31,7 +31,7 @@ import { HomeComponent } from './home/home.component';
     TreeModule,
     PanelModule,
     ButtonModule,
-    InputTextModule
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

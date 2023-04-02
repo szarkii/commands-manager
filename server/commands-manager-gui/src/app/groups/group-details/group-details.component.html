@@ -9,15 +9,26 @@
                 </div>
 
                 <div class="flex-1">
+                    <form (ngSubmit)="addNewGroup()" #newGroupForm="ngForm">
                     <div class="p-inputgroup">
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-box"></i>
                         </span>
 
-                        <input pInputText placeholder="Add new group" />
+                        <input
+                            pInputText
+                            name="newGroupName"
+                            [(ngModel)]="newGroupName"
+                            placeholder="Add new group"
+                            required />
 
-                        <button type="button" pButton icon="pi pi-check"></button>
+                        <button
+                            type="submit"
+                            pButton
+                            icon="pi pi-check"
+                            [disabled]="!newGroupForm.form.valid"></button>
                     </div>
+                </form>
                 </div>
             </div>
         </div>
