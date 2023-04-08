@@ -40,11 +40,11 @@ export class GroupsListComponent implements OnInit {
         }
       };
 
-      if (group.subgroups) {
+      if (group.subgroups && group.subgroups.length) {
         node.children = this.mapGroupsToTree(group.subgroups);
       }
 
-      if (group.commands) {
+      if (group.commands && group.commands.length) {
         node.children = group.commands.map((command: CommandBasicInfo) => ({
           label: command.name,
           icon: "pi pi-code",

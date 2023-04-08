@@ -31,7 +31,6 @@ async function getRequestContent(request) {
         let requestData = "";
 
         request.on("data", chunk => {
-            console.log(chunk);
             requestData += chunk.toString();
         });
 
@@ -88,16 +87,28 @@ const guiServer = async (request, response) => {
     }
 
     if (request.url.startsWith("/groups")) {
-        if (request.method === 'GET') {
+        if (request.method === "GET") {
             response.writeHead(200, { "Content-Type": "text/json" });
             response.write(JSON.stringify(groupsService.getAllGroups()));
+        }
+        
+        if (request.method === "PUT") {
+            const requestContent = JSON.parse(await getRequestContent(request));
+            
+            if (requestContent.name) {
+                groupsService.addGroup(requestContent);
+                response.writeHead(200);
+            } else {
+                response.writeHead(422, { "Content-Type": "text/plain" });
+                response.write("Group name is required.");
+            }
         }
 
         response.end();
         return;
     }
 
-    if (request.url.startsWith("/execute") && request.method === 'GET') {
+    if (request.url.startsWith("/execute") && request.method === "GET") {
         // TODO Implement
         return;
 
