@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ConfirmEventType, ConfirmationService, MessageService } from 'primeng/api';
 import { Observable, combineLatest, map } from 'rxjs';
 import { Group } from '../group';
 import { GroupsService } from '../groups.service';
@@ -17,7 +17,10 @@ export class GroupDetailsComponent {
   public newGroupModel: Group = {} as Group;
   public editGroupModel: Group = {} as Group;
 
-  constructor(private route: ActivatedRoute, private groupsService: GroupsService, private messageService: MessageService) {
+  private currentGroup: Group = {} as Group;
+
+  constructor(private route: ActivatedRoute, private router: Router, private groupsService: GroupsService,
+    private messageService: MessageService, private confirmationService: ConfirmationService) {
     // TODO Differentiate duplicates
     this.allGroups$ = this.groupsService.getAllGroups();
 
@@ -29,6 +32,8 @@ export class GroupDetailsComponent {
       map(([currentGroupId, allGroups]) => {
         const currentGroup = allGroups.find((group: Group) => group.id === currentGroupId);
         const parentGroup = allGroups.find((group: Group) => group.id === currentGroup?.parentId);
+
+        this.currentGroup = currentGroup as Group;
 
         this.newGroupModel.parentId = currentGroupId;
 
@@ -60,5 +65,28 @@ export class GroupDetailsComponent {
         this.messageService.add({ severity: "error", summary: "Error", detail: error.error });
       }
     });
+  }
+
+  public deleteGroup() {
+    this.confirmationService.confirm({
+      message: 'Do you want to delete the group and all sub-commands that are not assigned to any other group?',
+      header: 'Delete Confirmation',
+      icon: 'pi pi-info-circle',
+      accept: () => {
+        this.groupsService.deleteGroup(this.currentGroup.id).subscribe({
+          next: () => {
+            this.messageService.add({ severity: "success", summary: "Success", detail: "Group deleted." });
+            if (this.currentGroup.parentId) {
+              this.router.navigate(["/", "groups", this.currentGroup.parentId]);
+            } else {
+              this.router.navigate(["/"]);
+            }
+          }, error: (error) => {
+            this.messageService.add({ severity: "error", summary: "Error", detail: error.error });
+          }
+        });
+      }
+    });
+
   }
 }

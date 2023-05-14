@@ -29,4 +29,8 @@ export class GroupsService extends AbstractRestService {
   public editGroup(group: Group) {
     return this.http.post<HttpStatusCode>(this.getApiUrl("groups"), group);
   }
+
+  public deleteGroup(groupId: string) {
+    return this.http.delete<HttpStatusCode>(this.getApiUrl(["groups", groupId]));
+  }
 }

@@ -122,6 +122,13 @@ const guiServer = async (request, response) => {
             }
         }
 
+        if (request.method === "DELETE") {
+            // TODO validate ID
+            const id = request.url.replace("/groups/", "");
+            groupsService.deleteGroup(id);
+            response.writeHead(200);
+        }
+
         response.end();
         return;
     }

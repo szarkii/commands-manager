@@ -93,6 +93,13 @@ class GroupsService {
             saveGroupsConfiguration(groupsConfiguration);
         }
     }
+
+    deleteGroup(id) {
+        const groupsConfiguration = getGroupsConfiguration();
+        _.remove(groupsConfiguration.groups, (group) => group.id === id);
+        saveGroupsConfiguration(groupsConfiguration);
+        // TODO Remove all commands and subgroups
+    }
 };
 
 module.exports = GroupsService;
