@@ -5,6 +5,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
 import { ToastModule } from 'primeng/toast';
 import { TreeModule } from 'primeng/tree';
@@ -34,7 +36,9 @@ import { HomeComponent } from './home/home.component';
     PanelModule,
     ButtonModule,
     FormsModule,
-    ToastModule
+    ToastModule,
+    InputTextModule,
+    DropdownModule
   ],
   providers: [MessageService],
   bootstrap: [AppComponent]

@@ -65,6 +65,10 @@ class GroupsService {
     }
 
     getAllGroups() {
+        return getGroupsConfiguration().groups;
+    }
+
+    getAllGroupsTree() {
         const groupsConfiguration = getGroupsConfiguration();
         const allCommands = this.commandsService.getAllCommandsBasicInfo();
         return buildTreeFromArray(groupsConfiguration.groups, allCommands);
@@ -79,6 +83,15 @@ class GroupsService {
         }
         groupsConfiguration.groups.push(group);
         saveGroupsConfiguration(groupsConfiguration);
+    }
+
+    editGroup(groupData) {
+        const groupsConfiguration = getGroupsConfiguration();
+        const index = _.findIndex(groupsConfiguration.groups, (group) => group.id === groupData.id);
+        if (index >= 0) {
+            groupsConfiguration.groups[index] = groupData;
+            saveGroupsConfiguration(groupsConfiguration);
+        }
     }
 };
 

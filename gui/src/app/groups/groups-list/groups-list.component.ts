@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { TreeNode } from 'primeng/api';
 import { map } from 'rxjs';
 import { CommandBasicInfo } from 'src/app/command/command-basic-info';
-import { Group } from '../group';
+import { GroupTreeNode } from '../group-tree-node';
 import { GroupsService } from '../groups.service';
 
 @Component({
@@ -20,17 +20,17 @@ export class GroupsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.groupsService.getGroups()
-      .pipe(map((groups: Group[]) => this.mapGroupsToTree(groups)))
+    this.groupsService.getGroupsTree()
+      .pipe(map((groups: GroupTreeNode[]) => this.mapGroupsToTree(groups)))
       .subscribe((tree: TreeNode[]) => {
         this.groupsTreeNode = tree;
       });
   }
 
-  private mapGroupsToTree(groups: Group[]): TreeNode[] {
+  private mapGroupsToTree(groups: GroupTreeNode[]): TreeNode[] {
     const tree: TreeNode[] = [];
 
-    groups.forEach((group: Group) => {
+    groups.forEach((group: GroupTreeNode) => {
       const node: TreeNode = {
         label: group.name,
         icon: "pi pi-box",

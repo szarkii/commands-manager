@@ -1,39 +1,57 @@
-<div *ngIf="(group$ | async) as group">
-    <p-panel [header]="group.id">
+<div *ngIf="(currentGroup$ | async) as group">
+    <p-panel [header]="group.name + ' group'">
         <div class="card">
-            <div class="flex card-container">
-                <div class="flex-2  mr-4">
-                    <a [routerLink]="['/groups', group.id, 'commands', 'new']">
-                        <p-button label="Add new command" icon="pi pi-code"></p-button>
-                    </a>
-                </div>
+            <h3>Add command</h3>
+            <a [routerLink]="['/groups', group.id, 'commands', 'new']">
+                <p-button label="Add new command" icon="pi pi-code"></p-button>
+            </a>
 
-                <div class="flex-1">
-                    <form (ngSubmit)="addNewGroup()" #newGroupForm="ngForm">
-                    <div class="p-inputgroup">
+            <h3 class="mt-6">Add a subgroup</h3>
+            <form (ngSubmit)="addNewGroup()" #newGroupForm="ngForm">
+                <div class="grid col-6">
+                    <div class="p-inputgroup w-full">
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-box"></i>
                         </span>
 
-                        <input
-                            pInputText
-                            name="newGroupName"
-                            [(ngModel)]="newGroupName"
-                            placeholder="Add new group"
+                        <input pInputText name="newGroupName" [(ngModel)]="newGroupModel.name" placeholder="Name"
                             required />
 
-                        <button
-                            type="submit"
-                            pButton
-                            icon="pi pi-check"
-                            [disabled]="!newGroupForm.form.valid"></button>
+                        <button type="submit" pButton icon="pi pi-check" [disabled]="!newGroupForm.form.valid"></button>
                     </div>
-                </form>
                 </div>
-            </div>
-        </div>
+            </form>
 
-        <h3>Edit group</h3>
-        ...
+            <h3 class="mt-6">Edit group</h3>
+            <form (ngSubmit)="editGroup()" #editGroupForm="ngForm">
+                <div class="formgrid grid" *ngIf="(allGroups$ | async) as allGroups">
+                    <div class="field col-6">
+                        <label for="edit-group-name" class="w-full">Name</label>
+                        <input pInputText [(ngModel)]="editGroupModel.name" id="edit-group-name" name="edit-group-name" type="text"
+                            class="p-2 w-full" placeholder="Group name" [value]="group.name" required />
+                    </div>
+
+                    <div class="field block col-12"></div>
+
+                    <div class="field col-6">
+                        <label for="edit-group-parentId" class="w-full">Parent group</label>
+                        <p-dropdown [options]="allGroups" [(ngModel)]="editGroupModel.parentId" name="edit-group-parentId"
+                            optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [showClear]="true"
+                            placeholder="Select a parent group" class="w-full" [style]="{'width':'100%'}">
+                        </p-dropdown>
+                    </div>
+
+                    <div class="field block col-12"></div>
+
+                    <div class="field mt-2 col-6">
+                        <button label="Save" class="w-full" type="submit" pButton icon="pi pi-check"
+                            [disabled]="!editGroupForm.form.valid"></button>
+                    </div>
+                </div>
+            </form>
+
+            <h3 class="mt-6">Delete group</h3>
+            ...
+        </div>
     </p-panel>
 </div>

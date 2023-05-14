@@ -88,19 +88,37 @@ const guiServer = async (request, response) => {
 
     if (request.url.startsWith("/groups")) {
         if (request.method === "GET") {
-            response.writeHead(200, { "Content-Type": "text/json" });
-            response.write(JSON.stringify(groupsService.getAllGroups()));
+            if (request.url === "/groups") {
+                response.writeHead(200, { "Content-Type": "text/json" });
+                response.write(JSON.stringify(groupsService.getAllGroups()));
+            }
+            else if (request.url === "/groups&tree") {
+                response.writeHead(200, { "Content-Type": "text/json" });
+                response.write(JSON.stringify(groupsService.getAllGroupsTree()));
+            }
         }
-        
+
         if (request.method === "PUT") {
             const requestContent = JSON.parse(await getRequestContent(request));
-            
+
             if (requestContent.name) {
                 groupsService.addGroup(requestContent);
                 response.writeHead(200);
             } else {
                 response.writeHead(422, { "Content-Type": "text/plain" });
                 response.write("Group name is required.");
+            }
+        }
+
+        if (request.method === "POST") {
+            const requestContent = JSON.parse(await getRequestContent(request));
+
+            if (requestContent.id && requestContent.name) {
+                groupsService.editGroup(requestContent);
+                response.writeHead(200);
+            } else {
+                response.writeHead(422, { "Content-Type": "text/plain" });
+                response.write("Group ID and name is required.");
             }
         }
 

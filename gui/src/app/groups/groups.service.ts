@@ -2,8 +2,8 @@ import { HttpClient, HttpStatusCode } from "@angular/common/http";
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AbstractRestService } from "../abstract-rest.service";
-import { EditGroupDto } from "./edit-group-dto";
 import { Group } from "./group";
+import { GroupTreeNode } from "./group-tree-node";
 
 @Injectable({
   providedIn: 'root'
@@ -14,11 +14,19 @@ export class GroupsService extends AbstractRestService {
     super();
   }
 
-  public getGroups(): Observable<Group[]> {
+  public getAllGroups(): Observable<Group[]> {
     return this.http.get<Group[]>(this.getApiUrl("groups"));
   }
 
-  public addGroup(group: EditGroupDto) {
+  public getGroupsTree(): Observable<GroupTreeNode[]> {
+    return this.http.get<GroupTreeNode[]>(this.getApiUrl("groups&tree"));
+  }
+
+  public addGroup(group: Group) {
     return this.http.put<HttpStatusCode>(this.getApiUrl("groups"), group);
+  }
+
+  public editGroup(group: Group) {
+    return this.http.post<HttpStatusCode>(this.getApiUrl("groups"), group);
   }
 }

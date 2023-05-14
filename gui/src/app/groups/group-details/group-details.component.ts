@@ -1,12 +1,9 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { isNil } from 'lodash-es';
 import { MessageService } from 'primeng/api';
-import { Observable, filter, map, tap } from 'rxjs';
-import { EditGroupDto } from '../edit-group-dto';
+import { Observable, combineLatest, map } from 'rxjs';
 import { Group } from '../group';
 import { GroupsService } from '../groups.service';
-
 
 @Component({
   selector: 'app-group-details',
@@ -14,31 +11,54 @@ import { GroupsService } from '../groups.service';
   styleUrls: ['./group-details.component.css']
 })
 export class GroupDetailsComponent {
-  public group$: Observable<Group>;
+  public allGroups$: Observable<Group[]>;
+  public currentGroup$: Observable<Group>;
 
-  public newGroupName: string = "";
-
-  private groupId: string = "";
+  public newGroupModel: Group = {} as Group;
+  public editGroupModel: Group = {} as Group;
 
   constructor(private route: ActivatedRoute, private groupsService: GroupsService, private messageService: MessageService) {
-    this.group$ = this.route.paramMap.pipe(
-      map(params => params.get("id")),
-      filter((id) => !isNil(id)),
-      tap(id => this.groupId = id || ""),
-      map(id => ({ id } as Group))
+    // TODO Differentiate duplicates
+    this.allGroups$ = this.groupsService.getAllGroups();
+
+    const currentGroupId$: Observable<string> = this.route.paramMap.pipe(
+      map(params => params.get("id") as string)
     );
+
+    this.currentGroup$ = combineLatest([currentGroupId$, this.allGroups$]).pipe(
+      map(([currentGroupId, allGroups]) => {
+        const currentGroup = allGroups.find((group: Group) => group.id === currentGroupId);
+        const parentGroup = allGroups.find((group: Group) => group.id === currentGroup?.parentId);
+
+        this.newGroupModel.parentId = currentGroupId;
+
+        this.editGroupModel.id = currentGroupId;
+        this.editGroupModel.name = currentGroup?.name || "";
+        this.editGroupModel.parentId = parentGroup?.id;
+
+        return currentGroup;
+      })
+    ) as Observable<Group>;
   }
 
   public addNewGroup() {
-    const newGroup: EditGroupDto = {
-      name: this.newGroupName,
-      parentId: this.groupId
-    };
-    this.groupsService.addGroup(newGroup).subscribe(() => {
-      this.messageService.add({ severity: "success", summary: "Success", detail: `Group "${this.newGroupName}" added.` });
-      this.newGroupName = "";
-    }, (error) => {
-      this.messageService.add({ severity: "error", summary: "Error", detail: error.error });
+    this.groupsService.addGroup(this.newGroupModel).subscribe({
+      next: () => {
+        this.messageService.add({ severity: "success", summary: "Success", detail: `Group "${this.newGroupModel.name}" added.` });
+        this.newGroupModel.name = "";
+      }, error: (error) => {
+        this.messageService.add({ severity: "error", summary: "Error", detail: error.error });
+      }
+    });
+  }
+
+  public editGroup() {
+    this.groupsService.editGroup(this.editGroupModel).subscribe({
+      next: () => {
+        this.messageService.add({ severity: "success", summary: "Success", detail: `Group "${this.editGroupModel.name}" changed.` });
+      }, error: (error) => {
+        this.messageService.add({ severity: "error", summary: "Error", detail: error.error });
+      }
     });
   }
 }
