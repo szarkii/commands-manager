@@ -8,6 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import { PanelModule } from 'primeng/panel';
 import { ToastModule } from 'primeng/toast';
 import { TreeModule } from 'primeng/tree';
@@ -40,7 +41,8 @@ import { HomeComponent } from './home/home.component';
     ToastModule,
     InputTextModule,
     DropdownModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    InputTextareaModule
   ],
   providers: [MessageService, ConfirmationService],
   bootstrap: [AppComponent]

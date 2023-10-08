@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmEventType, ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Observable, combineLatest, map } from 'rxjs';
 import { Group } from '../group';
 import { GroupsService } from '../groups.service';

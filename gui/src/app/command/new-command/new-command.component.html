@@ -1,3 +1,22 @@
 <p-panel header="New command">
-    
+    <div class="formgrid">
+        <form (ngSubmit)="addNewCommand()" #newCommandForm="ngForm">
+            <div class="field col-6">
+                <label for="new-command-name" class="w-full">Name</label>
+                <input pInputText [(ngModel)]="newCommandModel.name" name="new-command-name" id="new-command-name"
+                    type="text" class="p-2 w-full" placeholder="Command name" required />
+            </div>
+
+            <div class="field col-12">
+                <label for="new-command-script" class="w-full">Script content</label>
+                <textarea id="new-command-script" name="new-command-script" rows="5" class="w-full" pInputTextarea
+                    [(ngModel)]="newCommandModel.script"></textarea>
+            </div>
+
+            <div class="field mt-2 col-6">
+                <button label="Save" class="w-full" type="submit" pButton icon="pi pi-check"
+                    [disabled]="!newCommandForm.form.valid"></button>
+            </div>
+        </form>
+    </div>
 </p-panel>
