@@ -19,6 +19,7 @@ import { NewCommandComponent } from './command/new-command/new-command.component
 import { GroupDetailsComponent } from './groups/group-details/group-details.component';
 import { GroupsListComponent } from './groups/groups-list/groups-list.component';
 import { HomeComponent } from './home/home.component';
+import { DividerModule } from 'primeng/divider';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { HomeComponent } from './home/home.component';
     InputTextModule,
     DropdownModule,
     ConfirmDialogModule,
-    InputTextareaModule
+    InputTextareaModule,
+    DividerModule
   ],
   providers: [MessageService, ConfirmationService],
   bootstrap: [AppComponent]

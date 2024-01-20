@@ -8,6 +8,12 @@ class CommandsService {
         this.idService = new IdService();
     }
 
+    getCommandDetails(commandId) {
+        const commandsConfiguration = getCommandsConfiguration();
+
+        return (commandsConfiguration.commands || []).find(command => command.id === commandId); 
+    }
+
     getAllCommandsBasicInfo() {
         const commandsConfiguration = getCommandsConfiguration();
         

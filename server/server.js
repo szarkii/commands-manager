@@ -144,6 +144,20 @@ const guiServer = async (request, response) => {
                 response.writeHead(200);
             }
 
+            if (request.method === "GET") {
+                const commandId = request.url.replace("/commands/", "");
+                // TODO Validate
+                
+                const command = commandsService.getCommandDetails(commandId);
+                
+                if (command) {
+                    response.writeHead(200, { "Content-Type": "text/json" });
+                    response.write(JSON.stringify(command));
+                } else {
+                    response.writeHead(404);
+                }
+            }
+
             response.end();
             return;
         }
