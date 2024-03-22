@@ -144,12 +144,135 @@ const guiServer = async (request, response) => {
                 response.writeHead(200);
             }
 
+            if (request.method === "GET" && request.url.endsWith("/execute")) {
+                const commandId = request.url.replace("/commands/", "").replace("/execute", "");
+                // TODO Validation
+
+                response.writeHead(200, {
+                    'Content-Type': 'text/event-stream',
+                    'Cache-Control': 'no-cache',
+                    'Connection': 'keep-alive'
+                });
+
+                let cnt = 0;
+
+                const commandProcess = commandExecuteService.executeAsync("test");
+                commandProcess.stdout.on("data", data => {
+                    logger.info(`stdout:\n${data}`);
+                    const id = new Date().getTime();
+
+                    const event = {
+                        name: 'message',
+                        data: cnt,
+                        id: cnt
+                    };
+
+                    cnt++;
+
+                    const eventString = `event: ${event.name}\ndata: ${event.data}\nid: ${event.id}\n\n`;
+                    console.log(eventString)
+                    response.write(eventString);
+                });
+
+                commandProcess.stderr.on("data", (data) => {
+                    logger.error(`stdout: ${data}`);
+                });
+
+                commandProcess.on("exit", code => {
+                    console.log(`Process ended with ${code}`);
+                    response.writeHead(code === 0 ? 200 : 500);
+                    response.end();
+                });
+
+                return;
+
+                const res = response;
+                // Set the response headers
+                res.writeHead(200, {
+                    'Content-Type': 'text/event-stream',
+                    'Cache-Control': 'no-cache',
+                    'Connection': 'keep-alive'
+                });
+                // Create a counter variable
+                let counter = 0;
+                // Create an interval function that sends an event every second
+                const interval = setInterval(() => {
+                    // Increment the counter
+                    counter++;
+                    // Create an event object with name, data, and id properties
+                    const event = {
+                        name: 'message',
+                        data: `Hello, this is message number ${counter}`,
+                        id: counter
+                    };
+                    // Convert the event object to a string
+                    const eventString = `event: ${event.name}\ndata: ${event.data}\nid: ${event.id}\n\n`;
+                    // Write the event string to the response stream
+                    res.write(eventString);
+                    // End the response stream after 10 events
+                    if (counter === 10) {
+                        clearInterval(interval);
+                        res.end();
+                    }
+                }, 1000);
+
+                return;
+
+
+
+                // response.writeHead(200, {
+                //     "Content-Type": "text/event-stream",
+                //     "Cache-Control": "no-cache"
+                // ,
+                // "Connection": "keep-alive"
+                // });
+
+                // let clientAvailable = true;
+                // request.on("close", () => {
+                //     clientAvailable = false;
+                // });
+
+                const clientId = new Date().getTime();
+
+                // logger.info(await commandExecuteService.execute(commandId));
+
+                // response.write("id: " + clientId + "\n");
+                // response.write("data: " + "aaaaa" + "\n\n");;
+                response.header('Cache-Control', 'no-cache');
+                response.header('Content-Type', 'text/event-stream');
+                setInterval(() => {
+                    response.write('data: ' + new Date().toISOString() + '\n\n');
+                }, 1000);
+
+                // response.writeHead(200);
+                // response.end();
+
+                return;
+
+                const process = commandExecuteService.executeAsync("test");
+                commandProcess.stdout.on("data", data => {
+                    logger.info(`stdout:\n${data}`);
+                    response.write("id: " + clientId + "\n");
+                    response.write("data: " + data + "\n\n");
+                });
+                commandProcess.stderr.on("data", (data) => {
+                    logger.error(`stdout: ${data}`);
+                });
+                commandProcess.on("exit", code => {
+                    console.log(`Process ended with ${code}`);
+                    response.writeHead(code === 0 ? 200 : 500);
+                    response.end();
+                });
+
+                return;
+            }
+
             if (request.method === "GET") {
                 const commandId = request.url.replace("/commands/", "");
                 // TODO Validate
-                
+
                 const command = commandsService.getCommandDetails(commandId);
-                
+
                 if (command) {
                     response.writeHead(200, { "Content-Type": "text/json" });
                     response.write(JSON.stringify(command));
@@ -159,49 +282,6 @@ const guiServer = async (request, response) => {
             }
 
             response.end();
-            return;
-        }
-
-        if (request.url.startsWith("/execute") && request.method === "GET") {
-            // TODO Implement
-            return;
-
-            const commandId = request.url.split("/")[2];
-            // TODO Validation
-
-            // if (request.method === 'GET') {
-            // response.writeHead(200);
-            // }
-
-            response.writeHead(200, {
-                "Content-Type": "text/event-stream",
-                "Cache-Control": "no-cache",
-                "Connection": "keep-alive"
-            });
-
-            let clientAvailable = true;
-            request.on("close", () => {
-                clientAvailable = false;
-            });
-
-            const clientId = (new Date()).toLocaleTimeString();
-
-            // logger.info(await commandExecuteService.execute(commandId));
-            const process = commandExecuteService.execute(commandId);
-            process.stdout.on("data", data => {
-                logger.info(`stdout:\n${data}`);
-                response.write("id: " + clientId + "\n");
-                response.write("data: " + data + "\n\n");
-            });
-            process.stderr.on("data", (data) => {
-                logger.error(`stdout: ${data}`);
-            });
-            process.on("exit", code => {
-                console.log(`Process ended with ${code}`);
-                response.writeHead(code === 0 ? 200 : 500);
-                response.end();
-            });
-
             return;
         }
 

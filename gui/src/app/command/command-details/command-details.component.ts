@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { CommandsService } from '../commands-service';
 import { CommandBasicInfo } from '../command-basic-info';
-import { Observable, map, switchMap } from 'rxjs';
+import { Observable, map, switchMap, tap } from 'rxjs';
 import { CommandDetails } from '../command-details';
 
 @Component({
@@ -14,14 +14,22 @@ export class CommandDetailsComponent {
   public command$: Observable<CommandDetails>;
   public editable = false;
 
+  private commandId: string = "";
+
   constructor(private route: ActivatedRoute, private commandsService: CommandsService) {
     this.command$ = this.route.paramMap.pipe(
       map((params: ParamMap) => params.get("id") as string),
-      switchMap((commandId: string) => this.commandsService.getCommandDetails(commandId))
+      tap((commandId) => this.commandId = commandId),
+      switchMap((commandId: string) => this.commandsService.getCommandDetails(commandId)),
     );
   }
 
   public toggleEditable() {
     this.editable = !this.editable;
+  }
+
+  public execute() {
+    console.log(this.commandId)
+    this.commandsService.execute(this.commandId).subscribe(console.log);
   }
 }
